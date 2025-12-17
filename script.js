@@ -354,9 +354,9 @@ class Lane {
 
         let difficultyFactor = Math.min(gameState.score, 100) / 100; // 0.0 to 1.0
 
-        // Speed: Fixed Medium Speed (2.5 - 4.5)
-        let minSpeed = 2.5;
-        let maxSpeed = 4.5;
+        // Speed: Fixed Fast Speed (3.5 - 6.0)
+        let minSpeed = 3.5;
+        let maxSpeed = 6.0;
         this.speed = (Math.random() * (maxSpeed - minSpeed) + minSpeed);
 
         this.direction = Math.random() > 0.5 ? 1 : -1;
@@ -544,7 +544,6 @@ function showStartScreen() {
     charSelectScreen.classList.add('hidden');
     // Draw background game for ambiance
     initGameEntities();
-    loop();
 }
 
 function startGame() {
@@ -649,4 +648,6 @@ function initGameEntities() {
 }
 
 // Initialize
+// Initialize
 showStartScreen();
+loop();

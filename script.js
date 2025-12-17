@@ -354,9 +354,9 @@ class Lane {
 
         let difficultyFactor = Math.min(gameState.score, 100) / 100; // 0.0 to 1.0
 
-        // Speed: Starts slow (1.5-2.5), ramps to (3.0-5.0)
-        let minSpeed = 1.5 + (1.5 * difficultyFactor);
-        let maxSpeed = 2.5 + (2.5 * difficultyFactor);
+        // Speed: Starts moderately fast (2.0-3.0), ramps to (3.5-5.5)
+        let minSpeed = 2.0 + (1.5 * difficultyFactor);
+        let maxSpeed = 3.0 + (2.5 * difficultyFactor);
         this.speed = (Math.random() * (maxSpeed - minSpeed) + minSpeed);
 
         this.direction = Math.random() > 0.5 ? 1 : -1;
@@ -365,10 +365,30 @@ class Lane {
         if (yIndex === ROWS - 1 || yIndex === ROWS - 2) this.type = 'safe';
 
         if (this.type === 'safe' && Math.random() > 0.3) {
-            const numTrees = Math.floor(Math.random() * 3);
-            for (let i = 0; i < numTrees; i++) {
-                const tx = Math.floor(Math.random() * COLS) * GRID_SIZE;
-                this.obstacles.push(new Tree(tx, this.y));
+            // Smart Tree Spawning
+            let potentialSlots = [];
+            for (let c = 0; c < COLS; c++) {
+                // Prevent spawn at player start (Center column on start row)
+                if (yIndex === ROWS - 2 && c === Math.floor(COLS / 2)) continue;
+                potentialSlots.push(c);
+            }
+
+            // Shuffle slots
+            potentialSlots.sort(() => Math.random() - 0.5);
+
+            const numTrees = Math.floor(Math.random() * 3) + 1; // 1 to 3 trees
+            let placedCols = [];
+
+            for (let col of potentialSlots) {
+                if (placedCols.length >= numTrees) break;
+
+                // Check adjacency (No trees right next to each other)
+                const isAdjacent = placedCols.some(pc => Math.abs(pc - col) <= 1);
+
+                if (!isAdjacent) {
+                    this.obstacles.push(new Tree(col * GRID_SIZE, this.y));
+                    placedCols.push(col);
+                }
             }
         }
     }
@@ -378,9 +398,9 @@ class Lane {
         this.obstacles.forEach(o => o.y = this.y);
 
         if (this.type === 'road') {
-            // Spawn Rate: Starts low (0.005), ramps to (0.02)
+            // Spawn Rate: Starts moderate (0.008), ramps to (0.025)
             let difficultyFactor = Math.min(gameState.score, 100) / 100;
-            let spawnChance = 0.005 + (0.015 * difficultyFactor);
+            let spawnChance = 0.008 + (0.017 * difficultyFactor);
 
             if (Math.random() < spawnChance) {
                 let validSpawn = true;

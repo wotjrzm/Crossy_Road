@@ -5,6 +5,7 @@ const finalScoreElement = document.getElementById('final-score');
 const gameOverScreen = document.getElementById('game-over');
 const startScreen = document.getElementById('start-screen');
 const charSelectScreen = document.getElementById('character-select');
+const pauseScreen = document.getElementById('pause-screen');
 
 // Buttons
 const startBtn = document.getElementById('start-btn');
@@ -351,10 +352,13 @@ class Lane {
         this.cars = [];
         this.obstacles = [];
 
-        let speedMultiplier = 1 + (gameState.score * 0.02);
-        speedMultiplier = Math.min(speedMultiplier, 3.5);
+        let difficultyFactor = Math.min(gameState.score, 100) / 100; // 0.0 to 1.0
 
-        this.speed = (Math.random() * 2 + 2) * speedMultiplier;
+        // Speed: Starts slow (1.5-2.5), ramps to (3.0-5.0)
+        let minSpeed = 1.5 + (1.5 * difficultyFactor);
+        let maxSpeed = 2.5 + (2.5 * difficultyFactor);
+        this.speed = (Math.random() * (maxSpeed - minSpeed) + minSpeed);
+
         this.direction = Math.random() > 0.5 ? 1 : -1;
         this.type = Math.random() > 0.4 ? 'road' : 'safe';
 
@@ -374,7 +378,11 @@ class Lane {
         this.obstacles.forEach(o => o.y = this.y);
 
         if (this.type === 'road') {
-            if (Math.random() < 0.02) {
+            // Spawn Rate: Starts low (0.005), ramps to (0.02)
+            let difficultyFactor = Math.min(gameState.score, 100) / 100;
+            let spawnChance = 0.005 + (0.015 * difficultyFactor);
+
+            if (Math.random() < spawnChance) {
                 let validSpawn = true;
                 for (let car of this.cars) {
                     if (this.direction === 1 && car.x < GRID_SIZE * 2) validSpawn = false;
@@ -436,6 +444,19 @@ function scrollWorld() {
 const keysHeld = {};
 
 document.addEventListener('keydown', (e) => {
+    // ESC / Pause Handling
+    if (e.key === 'Escape') {
+        if (gameState.mode === 'PLAYING') {
+            gameState.mode = 'PAUSED';
+            pauseScreen.classList.remove('hidden');
+        } else if (gameState.mode === 'PAUSED') {
+            gameState.mode = 'PLAYING';
+            pauseScreen.classList.add('hidden');
+            // Resume loop if needed, but loop checks mode
+        }
+        return;
+    }
+
     if (gameState.mode !== 'PLAYING') return;
 
     const key = e.key.toLowerCase();
@@ -508,7 +529,7 @@ function selectChar(e) {
 
 // Event Listeners
 startBtn.addEventListener('click', startGame);
-restartBtn.addEventListener('click', startGame);
+restartBtn.addEventListener('click', showStartScreen);
 charsBtn.addEventListener('click', showCharSelect);
 backBtn.addEventListener('click', () => {
     charSelectScreen.classList.add('hidden');
@@ -560,11 +581,11 @@ function draw() {
 }
 
 function loop() {
-    update();
-    draw();
-    if (true) { // Always loop for background effects
-        requestAnimationFrame(loop);
+    if (gameState.mode !== 'PAUSED') {
+        update();
+        draw();
     }
+    requestAnimationFrame(loop);
 }
 
 function initGameEntities() {

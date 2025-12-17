@@ -354,9 +354,9 @@ class Lane {
 
         let difficultyFactor = Math.min(gameState.score, 100) / 100; // 0.0 to 1.0
 
-        // Speed: Starts moderately fast (2.0-3.0), ramps to (3.5-5.5)
-        let minSpeed = 2.0 + (1.5 * difficultyFactor);
-        let maxSpeed = 3.0 + (2.5 * difficultyFactor);
+        // Speed: Fixed Medium Speed (2.5 - 4.5)
+        let minSpeed = 2.5;
+        let maxSpeed = 4.5;
         this.speed = (Math.random() * (maxSpeed - minSpeed) + minSpeed);
 
         this.direction = Math.random() > 0.5 ? 1 : -1;
@@ -388,6 +388,32 @@ class Lane {
                 if (!isAdjacent) {
                     this.obstacles.push(new Tree(col * GRID_SIZE, this.y));
                     placedCols.push(col);
+                }
+            }
+        }
+
+        // Pre-populate Cars
+        if (this.type === 'road') {
+            // Chance to have initial cars
+            const numInitialCars = Math.floor(Math.random() * 3); // 0-2 cars initially
+            let placedCars = [];
+
+            for (let i = 0; i < numInitialCars; i++) {
+                const width = GRID_SIZE * (Math.random() > 0.7 ? 2.5 : 1.5);
+                const xPos = Math.random() * (canvas.width - width);
+
+                // Check Overlap
+                let overlap = false;
+                for (let pc of placedCars) {
+                    if (xPos < pc.x + pc.width + 20 && xPos + width + 20 > pc.x) {
+                        overlap = true;
+                        break;
+                    }
+                }
+
+                if (!overlap) {
+                    this.cars.push(new Car(xPos, this.y, width, this.speed, this.direction));
+                    placedCars.push({ x: xPos, width: width });
                 }
             }
         }

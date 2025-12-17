@@ -263,21 +263,25 @@ class Player {
         }
 
         if (!blockedY) {
-            if (dy < 0) {
+            if (dy < 0) { // Moving Up (Forward)
+                gameState.currentDistance++;
+                if (gameState.currentDistance > gameState.score) {
+                    gameState.score = gameState.currentDistance;
+                    scoreElement.textContent = gameState.score;
+                }
+
                 if (newY < SCROLL_THRESHOLD) {
                     scrollWorld();
-                    gameState.score++;
-                    scoreElement.textContent = gameState.score;
+                    // Score logic handles globally above
                 } else {
                     if (newY >= 0) {
                         this.y = newY;
-                        gameState.score++;
-                        scoreElement.textContent = gameState.score;
                     }
                 }
-            } else if (dy > 0) {
+            } else if (dy > 0) { // Moving Down (Backward)
                 if (newY < canvas.height) {
                     this.y = newY;
+                    gameState.currentDistance = Math.max(0, gameState.currentDistance - 1);
                 }
             }
         }
@@ -565,6 +569,7 @@ function loop() {
 
 function initGameEntities() {
     gameState.score = 0;
+    gameState.currentDistance = 0;
     gameState.frameCount = 0;
     scoreElement.textContent = 0;
 

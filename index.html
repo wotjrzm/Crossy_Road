@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Casual Crossy Game</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div id="game-container">
+        <h1>Road Crosser</h1>
+        <div id="score-board">Score: <span id="score">0</span></div>
+        <canvas id="gameCanvas" width="800" height="600"></canvas>
+        <p>Use <strong>W, A, S, D</strong> to move.</p>
+
+        <!-- Start Screen -->
+        <div id="start-screen">
+            <h2>Crossy Road</h2>
+            <button id="start-btn" class="menu-btn">Play Game</button>
+            <button id="chars-btn" class="menu-btn">Characters</button>
+        </div>
+
+        <!-- Character Select -->
+        <div id="character-select" class="hidden">
+            <h2>Choose Your Character</h2>
+            <div id="char-list">
+                <button class="char-btn" data-type="pig">Pig 🐷</button>
+                <button class="char-btn" data-type="chicken">Chicken 🐔</button>
+                <button class="char-btn" data-type="duck">Duck 🦆</button>
+                <button class="char-btn" data-type="cow">Cow 🐮</button>
+            </div>
+            <button id="back-btn" class="menu-btn">Back</button>
+        </div>
+
+        <div id="game-over" class="hidden">
+            <h2>Game Over!</h2>
+            <p>Your Score: <span id="final-score">0</span></p>
+            <button id="restart-btn" class="menu-btn">Restart</button>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+
+</html>
